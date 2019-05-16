@@ -24,6 +24,8 @@
 
 @property (strong, nonatomic) NSString *bodyText;
 
+@property (strong, nonatomic) NSNumber *userID;
+
 @end
 
 
@@ -44,6 +46,7 @@
     self.imageDownloadOperationQueue.maxConcurrentOperationCount = 4;
     self.imageCache = [NSCache new];
     self.bodyText = [NSString new];
+    self.userID = [NSNumber new];
     
     [self.answersTableView registerNib:[UINib nibWithNibName:GStackOverFlowNibName_QuestionTableViewCell bundle:nil] forCellReuseIdentifier:GStackOverflowReusableCellID_QuestionTableViewCellID];
     
@@ -55,6 +58,7 @@
     [WebApi request:requestQuestionBodyDetail completion:^(NSDictionary * _Nonnull data) {
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
             self.bodyText = [[[data objectForKey:@"items"] objectAtIndex:0] objectForKey:@"body_markdown"];
+            self.userID = [[[[data objectForKey:@"items"] objectAtIndex:0] valueForKey:@"owner"] valueForKey:@"user_id"];
             [self.answersTableView reloadData];
         }];
     }];
@@ -146,6 +150,7 @@
             case 0:
                 vc.profileImage = self.profileImage;
                 vc.displayName = self.question.owner;
+                vc.userID = self.userID;
                 break;
                 
             default: {
